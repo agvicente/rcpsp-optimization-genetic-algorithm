@@ -30,7 +30,7 @@ class Schedule:
         self.renewable_resources = np.append(self.renewable_resources, resource)
 
     
-    def is_valid_precedence_relations(self):
+    def is_valid_precedence_relations_constraint(self):
         for i in range(len(self.tasks)):
             task = self.tasks[i]
             subarray = self.tasks[:i]
@@ -38,4 +38,13 @@ class Schedule:
                 if predecessor not in subarray:
                     return False
             
+        return True
+    
+    def is_valid_duplicate_tasks_constraint(self):
+        for i in range(len(self.tasks)):
+            task = self.tasks[i]
+            subarray = self.tasks[:i]
+            if task in subarray:
+                return False
+        
         return True

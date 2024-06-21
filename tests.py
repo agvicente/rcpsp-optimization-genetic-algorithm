@@ -1,4 +1,5 @@
 from Project import Schedule, Task, Resource
+import numpy as np
 
 print('----------------------------------------------')
 print('Test 1: Creating a Schedule object')
@@ -42,10 +43,16 @@ task2 = Task("Task 2", duration=10, predecessors=[task1], renewable_resources=[r
 
 schedule.add_tasks([task3, task4, task5, task6, task8, task7, task9, task10, task11])
 
-is_valid = schedule.is_valid_precedence_relations()
+is_valid = schedule.is_valid_precedence_relations_constraint()
 
 print_tasks()
 
 print('Is valid:', is_valid)
+
+print('----------------------------------------------')
+
+print('Test 3: Duplicate tasks')
+
+print('Is valid:', schedule.is_valid_duplicate_tasks_constraint())
 
 print('----------------------------------------------')
