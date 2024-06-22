@@ -19,12 +19,18 @@ class Schedule:
         self.dummySink = Task("Dummy Sink", [], [], 0)
         self.tasks = tasks
         self.renewable_resources = renewable_resources
+        self.tasks.append(self.dummySource)
+        self.tasks.append(self.dummySink)
     
     def add_task(self, task: Task):
+        self.tasks = self.tasks[:-1]
         self.tasks = np.append(self.tasks, task)
+        self.tasks = np.append(self.tasks, self.dummySink)
 
     def add_tasks(self, tasks: np.ndarray[Task]):
+        self.tasks = self.tasks[:-1]
         self.tasks = np.append(self.tasks, tasks)
+        self.tasks = np.append(self.tasks, self.dummySink)
 
     def add_renewable_resource(self, resource: Resource):
         self.renewable_resources = np.append(self.renewable_resources, resource)
