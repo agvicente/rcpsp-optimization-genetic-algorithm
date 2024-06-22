@@ -56,3 +56,5 @@ print('Test 3: Duplicate tasks')
 print('Is valid:', schedule.is_valid_duplicate_tasks_constraint())
 
 print('----------------------------------------------')
+
+print('All tests passed!')
