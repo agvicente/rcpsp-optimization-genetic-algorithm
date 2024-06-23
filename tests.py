@@ -134,14 +134,49 @@ c2 = Task("C2", duration=3)
 c3 = Task("C3", duration=2)
 c4 = Task("C4", duration=5)
 
-c2.add_predecessors([c1])
-c3.add_predecessors([c1])
-c4.add_predecessors([c2, c3])
+# c2.add_predecessors([c1])
+# c3.add_predecessors([c1])
+# c4.add_predecessors([c2, c3])
 
 schedule4.add_tasks([c1, c2, c3, c4])
 
 print(schedule4.makespan())
 
 print('----------------------------------------------')
+
+print("Test 7: Resource availability")
+
+schedule5 = Schedule()
+
+d1 = Task("D1", duration=3)
+d2 = Task("D2", duration=4)
+d3 = Task("D3", duration=2)
+d4 = Task("D4", duration=2)
+d5 = Task("D5", duration=1)
+d6 = Task("D6", duration=4)
+
+d3.add_predecessors([d1])
+d4.add_predecessors([d2])
+d5.add_predecessors([d3])
+d6.add_predecessors([d4])
+
+r1 = Resource("R1", 4)
+
+d1.add_renewable_resource(r1, 2)
+d2.add_renewable_resource(r1, 3)
+d3.add_renewable_resource(r1, 4)
+d4.add_renewable_resource(r1, 4)
+d5.add_renewable_resource(r1, 3)
+d6.add_renewable_resource(r1, 2)
+
+schedule5.add_renewable_resource(r1)
+
+schedule5.add_tasks([d2, d4, d6, d1, d3, d5])
+
+makespan = schedule5.makespan()
+
+print_time_windows_es_ef(schedule5)
+print('Schedule 5 Makespan:', makespan)
+
 
 print('All tests passed!')

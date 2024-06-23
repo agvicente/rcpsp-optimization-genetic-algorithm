@@ -6,11 +6,11 @@ class Schedule:
     def __init__(
             self,
     ) -> None:
-        self.dummySource = Task("Dummy Source", 0, [], 0, 0, 0, 0)
-        self.dummySink = Task("Dummy Sink", 0, [], 0, 0, 0, 0)
+        self.dummySource = Task("Dummy Source")
+        self.dummySink = Task("Dummy Sink")
         self.dummySink.add_predecessor(self.dummySource)
         self.tasks = []
-        self.renewable_resources = []
+        self.renewable_resources: np.ndarray[Resource] = []
         self.tasks.append(self.dummySource)
         self.tasks.append(self.dummySink)
     
@@ -96,8 +96,37 @@ class Schedule:
             task.latest_start = latest_start
         
         return True
+    
+    def adjust_time_intervals_to_resource_constraints(self):
+        for resource in self.renewable_resources:
+            resources_per_time = [0 for _ in range(self.dummySink.earliest_finish)]
+            for task in self.tasks:
+                for i in range(task.earliest_start, task.earliest_finish):
+                    if resources_per_time[i] + task.renewable_resources[resource] <= resource.per_period_availability: #TODO: expandir para fazer para todos os recursos
+                        resources_per_time[i] += task.renewable_resources[resource]
+                        continue
+                    for time in range(task.earliest_start, len(resources_per_time)):
+                        if resources_per_time[time] + task.renewable_resources[resource] > resource.per_period_availability:
+                            resources_per_time = np.append(resources_per_time, 0)
+                            continue
+                        else:
+                            task.earliest_start = time
+                            task.earliest_finish = time + task.duration
+                            for sucessor in task.sucessors:
+                                sucessor.earliest_start = task.earliest_finish
+                                sucessor.earliest_finish = sucessor.earliest_start + sucessor.duration
+                            for i in range(task.earliest_start, task.earliest_finish):
+                                if resources_per_time[i] + task.renewable_resources[resource] <= resource.per_period_availability:
+                                    resources_per_time[i] += task.renewable_resources[resource]
+                        break
+                    break
+        
+        self.dummySink.earliest_finish = np.max([task.earliest_finish for task in self.tasks])
+        self.dummySink.earliest_start = self.dummySink.earliest_finish
+
+
 
     def makespan(self) -> int:
         self.forward_recursion()
+        self.adjust_time_intervals_to_resource_constraints()
         return self.dummySink.earliest_finish
-    
