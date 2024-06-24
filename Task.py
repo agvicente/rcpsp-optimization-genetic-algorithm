@@ -47,7 +47,7 @@ class Task:
             tasks: np.ndarray['Task']
     ):
         for task in tasks:
-            self.__add_sucessor(task)
+            self.add_sucessor(task)
     
     def add_renewable_resource(
             self, 

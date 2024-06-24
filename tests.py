@@ -11,8 +11,8 @@ schedule = Schedule()
 resource1 = Resource("Resource 1", 10)
 resource2 = Resource("Resource 2", 20)
 
-task1 = Task("Task 1", duration=5, renewable_resources=[resource1])
-task2 = Task("Task 2", duration=10, renewable_resources=[resource2])
+task1 = Task("Task 1", duration=5)
+task2 = Task("Task 2", duration=10)
 
 schedule.add_renewable_resource(resource1)
 schedule.add_renewable_resource(resource2)
@@ -31,17 +31,17 @@ print('----------------------------------------------')
 
 print('Test 2: Precedence relations')
 
-task10 = Task("Task 10", duration=5, renewable_resources=[resource1])
-task11 = Task("Task 11", duration=5, renewable_resources=[resource1])
-task9 = Task("Task 9", duration=5, renewable_resources=[resource1])
-task4 = Task("Task 4", duration=10, renewable_resources=[resource2])
-task5 = Task("Task 5", duration=5, renewable_resources=[resource1, resource2])
-task6 = Task("Task 6", duration=5, renewable_resources=[resource1])
-task8 = Task("Task 8", duration=5, renewable_resources=[resource1])
-task7 = Task("Task 7", duration=5, renewable_resources=[resource2])
-task3 = Task("Task 3", duration=5, renewable_resources=[resource1])
-task1 = Task("Task 1", duration=5, renewable_resources=[resource1])
-task2 = Task("Task 2", duration=10, renewable_resources=[resource2])
+task10 = Task("Task 10", duration=5)
+task11 = Task("Task 11", duration=5)
+task9 = Task("Task 9", duration=5)
+task4 = Task("Task 4", duration=10)
+task5 = Task("Task 5", duration=5)
+task6 = Task("Task 6", duration=5)
+task8 = Task("Task 8", duration=5)
+task7 = Task("Task 7", duration=5)
+task3 = Task("Task 3", duration=5)
+task1 = Task("Task 1", duration=5)
+task2 = Task("Task 2", duration=10)
 
 task10.add_predecessors([task1])
 task11.add_predecessors([task1])
@@ -146,6 +146,10 @@ print('----------------------------------------------')
 
 print("Test 7: Resource availability")
 
+def print_time_windows_es_ef(schedule: Schedule):
+    for task in schedule.tasks:
+        print(task.name, [task.earliest_start, task.earliest_finish])
+
 schedule5 = Schedule()
 
 d1 = Task("D1", duration=3)
@@ -154,11 +158,13 @@ d3 = Task("D3", duration=2)
 d4 = Task("D4", duration=2)
 d5 = Task("D5", duration=1)
 d6 = Task("D6", duration=4)
+d7 = Task("D7", duration=1)
 
 d3.add_predecessors([d1])
 d4.add_predecessors([d2])
 d5.add_predecessors([d3])
 d6.add_predecessors([d4])
+d7.add_predecessors([d1])
 
 r1 = Resource("R1", 4)
 
@@ -168,15 +174,62 @@ d3.add_renewable_resource(r1, 4)
 d4.add_renewable_resource(r1, 4)
 d5.add_renewable_resource(r1, 3)
 d6.add_renewable_resource(r1, 2)
+d7.add_renewable_resource(r1, 2)
 
 schedule5.add_renewable_resource(r1)
 
-schedule5.add_tasks([d2, d4, d6, d1, d3, d5])
+schedule5.add_tasks([d2, d4, d6, d1, d3, d5, d7])
 
 makespan = schedule5.makespan()
 
 print_time_windows_es_ef(schedule5)
 print('Schedule 5 Makespan:', makespan)
 
+print('----------------------------------------------')
 
+print("Test 8: Resource availability - using sucesors instead predecessors")
+
+def print_time_windows_es_ef(schedule: Schedule):
+    for task in schedule.tasks:
+        print(task.name, [task.earliest_start, task.earliest_finish])
+
+schedule5 = Schedule()
+
+d1 = Task("D1", duration=3)
+d2 = Task("D2", duration=4)
+d3 = Task("D3", duration=2)
+d4 = Task("D4", duration=2)
+d5 = Task("D5", duration=1)
+d6 = Task("D6", duration=4)
+d7 = Task("D7", duration=1)
+
+#d3.add_predecessors([d1])
+d1.add_sucessors([d3])
+#d4.add_predecessors([d2])
+d2.add_sucessors([d4])
+# d5.add_predecessors([d3])
+d3.add_sucessors([d5])
+# d6.add_predecessors([d4])
+d4.add_sucessors([d6])
+# d7.add_predecessors([d1])
+d1.add_sucessors([d7])
+
+r1 = Resource("R1", 4)
+
+d1.add_renewable_resource(r1, 2)
+d2.add_renewable_resource(r1, 3)
+d3.add_renewable_resource(r1, 4)
+d4.add_renewable_resource(r1, 4)
+d5.add_renewable_resource(r1, 3)
+d6.add_renewable_resource(r1, 2)
+d7.add_renewable_resource(r1, 2)
+
+schedule5.add_renewable_resource(r1)
+
+schedule5.add_tasks([d2, d4, d6, d1, d3, d5, d7])
+
+makespan = schedule5.makespan()
+
+print_time_windows_es_ef(schedule5)
+print('Schedule 5 Makespan:', makespan)
 print('All tests passed!')
