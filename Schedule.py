@@ -23,6 +23,13 @@ class Schedule:
         self.tasks = self.tasks[:-1]
         self.tasks = np.append(self.tasks, task)
         self.tasks = np.append(self.tasks, self.dummySink)
+    
+    def remove_task(
+            self,
+            Task: Task,
+    ):
+        self.tasks = np.delete(self.tasks, np.where(self.tasks == Task)).tolist()
+        
 
     def add_tasks(
             self, 
@@ -37,13 +44,22 @@ class Schedule:
     ):
         self.renewable_resources = np.append(self.renewable_resources, resource)
 
+    def add_renewable_resources(
+            self, 
+            resources: np.ndarray[Resource]
+    ):
+        for resource in resources:
+            self.add_renewable_resource(resource)
+
     
     def is_valid_precedence_relations_constraint(self) -> bool:
         for i in range(len(self.tasks)):
             task = self.tasks[i]
+            if task == self.dummySource or task == self.dummySink:
+                continue
             subarray = self.tasks[:i]
             for predecessor in task.predecessors:
-                if predecessor not in subarray:
+                if predecessor not in subarray and predecessor.name != self.dummySource.name and predecessor.name != self.dummySink.name:
                     return False
             
         return True
@@ -99,7 +115,8 @@ class Schedule:
     
     def adjust_time_intervals_to_resource_constraints(self):
         for resource in self.renewable_resources:
-            resources_per_time = [0 for _ in range(self.dummySink.earliest_finish)]
+            times = np.max([task.earliest_finish for task in self.tasks])
+            resources_per_time = [0 for _ in range(times)]
             for task in self.tasks:
                 for i in range(task.earliest_start, task.earliest_finish):
                     if resources_per_time[i] + task.renewable_resources[resource] <= resource.per_period_availability: #TODO: expandir para fazer para todos os recursos
