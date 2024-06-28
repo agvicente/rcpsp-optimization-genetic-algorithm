@@ -116,7 +116,7 @@ class Schedule:
     def adjust_time_intervals_to_resource_constraints(self):
         for resource in self.renewable_resources:
             times = np.max([task.earliest_finish for task in self.tasks])
-            resources_per_time = [0 for _ in range(times)]
+            resources_per_time = [0 for _ in range(times * 2)]
             for task in self.tasks:
                 for i in range(task.earliest_start, task.earliest_finish):
                     if resources_per_time[i] + task.renewable_resources[resource] <= resource.per_period_availability: #TODO: expandir para fazer para todos os recursos
