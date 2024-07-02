@@ -64,6 +64,19 @@ class Schedule:
             
         return True
     
+    def count_precedence_relations_violations(self) -> int:
+        count = 0
+        for i in range(len(self.tasks)):
+            task = self.tasks[i]
+            if task == self.dummySource or task == self.dummySink:
+                continue
+            subarray = self.tasks[:i]
+            for predecessor in task.predecessors:
+                if predecessor not in subarray and predecessor.name != self.dummySource.name and predecessor.name != self.dummySink.name:
+                    count += 1
+            
+        return count
+    
     def is_valid_duplicate_tasks_constraint(self) -> bool:
         for i in range(len(self.tasks)):
             task = self.tasks[i]
@@ -113,7 +126,7 @@ class Schedule:
         
         return True
     
-    def adjust_time_intervals_to_resource_constraints(self):
+    def adjust_time_intervals_to_resource_constraints(self) -> None:
         for resource in self.renewable_resources:
             times = np.max([task.earliest_finish for task in self.tasks])
             resources_per_time = [0 for _ in range(times * 2)]
@@ -141,9 +154,18 @@ class Schedule:
         self.dummySink.earliest_finish = np.max([task.earliest_finish for task in self.tasks])
         self.dummySink.earliest_start = self.dummySink.earliest_finish
 
-
-
+    
     def makespan(self) -> int:
         self.forward_recursion()
         self.adjust_time_intervals_to_resource_constraints()
+        violations = self.count_precedence_relations_violations()
+        if violations == 0:
+            return self.dummySink.earliest_finish
+        
+        return self.dummySink.earliest_finish + violations**2
+    
+    def makespan_without_penalization(self) -> int:
+        self.forward_recursion()
+        self.adjust_time_intervals_to_resource_constraints()
         return self.dummySink.earliest_finish
+    
