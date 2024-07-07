@@ -155,14 +155,14 @@ class Schedule:
         self.dummySink.earliest_start = self.dummySink.earliest_finish
 
     
-    def makespan(self) -> int:
+    def makespan(self, alpha: float) -> int:
         self.forward_recursion()
         self.adjust_time_intervals_to_resource_constraints()
         violations = self.count_precedence_relations_violations()
         if violations == 0:
             return self.dummySink.earliest_finish
         
-        return self.dummySink.earliest_finish + violations**2
+        return self.dummySink.earliest_finish + alpha*(violations**2)
     
     def makespan_without_penalization(self) -> int:
         self.forward_recursion()
